@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors")
 
 const userRoutes = require("./routes/userRoutes")
+const postRoutes = require("./routes/postRoutes")
 
 
 dotenv.config();
@@ -22,6 +23,8 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/user/", userRoutes)
+app.use("/api/post/", postRoutes)
+
 
 
 //connect to DB
