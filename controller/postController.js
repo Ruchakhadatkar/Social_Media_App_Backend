@@ -3,13 +3,28 @@ const Post = require("../models/postModel");
 const User = require("../models/userModels");
 
 const userPost = async (req, res) => {
-  const { caption, image, userId, content, likedUsers } = req.body;
+  const { caption, image, userId } = req.body;
 
-  const data = Post({ caption, image, userId,content, likedUsers });
+  try {
+    if(!userId ){
+      return res.json({error: "User required", success: false})
 
-  await data.save();
-  // console.log(data);
-  res.json(data);
+    }
+    if( !caption || !image){
+      return res.json({error: "Caption or Image required", success: false})
+    }
+
+    const data = Post({ caption, image, userId });
+
+    await data.save();
+    // console.log(data);
+    return res.json(data);
+
+  } catch (error) {
+    return res.json({error: error.message, success: false} )
+  }
+
+ 
 };
 
 // const getPost  = async (req, res)=>{
