@@ -4,21 +4,22 @@ const Schema = mongoose.Schema;
 
 const friendsSchema = new Schema(
   {
-    userId: {
+    userId1: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    friendId: {
+    userId2: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    friendshipDate: {
-      type: String,
-    },
+    frindshipDate:{
+      type: Date,
+      default: Date.now
+    }
   },
-  { timestamps: true }
+ 
 );
 
 const Friends = mongoose.model("Friends", friendsSchema);

@@ -18,9 +18,12 @@ const postSchema = new Schema(
       required: true,
       ref: "User",
     },
-    // likedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    postDate:{
+      type: Date,
+      default: Date.now
+    }
   },
-  { timestamps: true }
+ 
 );
 
 const Post = mongoose.model("Post", postSchema);

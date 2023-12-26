@@ -14,11 +14,12 @@ const likedSchema = new Schema(
       required: true,
       ref: "Post",
     },
-    date: {
-      type: String,
-    },
+    likedDate:{
+      type: Date,
+      default: Date.now
+    }
   },
-  { timestamps: true }
+ 
 );
 
 const Like = mongoose.model("Like", likedSchema);
