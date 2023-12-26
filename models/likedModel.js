@@ -2,25 +2,25 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const friendRequestSchema = new Schema(
+const likedSchema = new Schema(
   {
-    sender: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
+      required: true,
       ref: "User",
     },
-    receiver: {
+    postId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      required: true,
+      ref: "Post",
     },
-    requestDate: {
-      type: String,
-    },
-    status: {
+    date: {
       type: String,
     },
   },
   { timestamps: true }
 );
 
-const Request = mongoose.model("Request", friendRequestSchema);
-module.exports = Request;
+const Like = mongoose.model("Like", likedSchema);
+
+module.exports = Like;
