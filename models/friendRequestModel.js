@@ -7,10 +7,12 @@ const friendRequestSchema = new Schema(
     senderUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     receiverUserId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     status: {
       type: String,

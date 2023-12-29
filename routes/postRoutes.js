@@ -1,10 +1,12 @@
-const express = require('express')
-const requireAuth = require('../middleware/requireAuth')
-const {userPost, getPost} = require("../controller/postController")
-const router = express.Router()
+const express = require("express");
+const requireAuth = require("../middleware/requireAuth");
+const { userPost, getPost } = require("../controller/postController");
+const { route } = require("./friendRequestRoute");
+const router = express.Router();
 
-router.post("/",requireAuth, userPost )
+router.post("/", userPost);
 
-router.get("/",requireAuth, getPost)
+router.get("/", getPost);
 
-module.exports = router
+module.exports = router;
+

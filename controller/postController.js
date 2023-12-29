@@ -1,48 +1,97 @@
+const Friends = require("../models/friendsModel");
 const Post = require("../models/postModel");
+const Likes = require("../models/likedModel")
 
 const User = require("../models/userModels");
 
 const userPost = async (req, res) => {
   const { caption, image, userId } = req.body;
-
   try {
-    if(!userId ){
-      return res.json({error: "User required", success: false})
-
+    if (!userId) {
+      return res.json({ error: "User required", success: false });
     }
-    if( !caption || !image){
-      return res.json({error: "Caption or Image required", success: false})
+    if (!caption && !image) {
+      return res.json({ error: "Caption or Image required", success: false });
     }
-
     const data = Post({ caption, image, userId });
-
     await data.save();
-    // console.log(data);
-    return res.json(data);
-
+    return res.json({ data, success: true });
   } catch (error) {
-    return res.json({error: error.message, success: false} )
+    return res.json({ error: error.message, success: false });
   }
-
- 
 };
-
-// const getPost  = async (req, res)=>{
-//   const data = await Post.find()
-
-//   res.json(data)
-// }
 
 const getPost = async (req, res) => {
-  
+  const userId = req.query.id; // replace with the user's ID
   try {
-    const posts = await Post.find();
+    const user = await User.findById(userId);
 
-    res.json(posts);
+    // Get friends' IDs from the Friendship table
+    const friendIds = await Friends.find({
+      $or: [{ userId1: userId }, { userId2: userId }],
+    }).select("userId1 userId2 _id");
+
+    const allFriendIds = friendIds.map((friendship) =>
+      friendship.userId1.equals(userId)
+        ? friendship.userId2
+        : friendship.userId1
+    );
+
+    // Include the user's own ID
+    allFriendIds.push(userId);
+
+    // Find posts of friends and the user
+    const posts = await Post.find({ userId: { $in: allFriendIds } })
+    .sort({
+      postDate: -1,
+    }).populate("userId", "name")
+
+     // Populate the liked users for each post
+     const postsWithLikes = await Promise.all(posts.map(async post => {
+      const likedUsers = await Likes.find({ postId: post._id }).populate('userId', 'name _id');
+      return { ...post._doc, likedUsers };
+    }));
+
+    res.json(postsWithLikes);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch posts" });
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 };
+
+
+// app.get('/posts-with-likes/:userId', async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+
+//     // Get friends' IDs from the Friendship table
+//     const friendIds = await Friendship.find({
+//       $or: [{ userID1: userId }, { userID2: userId }],
+//       status: 'Accepted' // Assuming you have a 'status' field in Friendship to track the status
+//     }).select('userID1 userID2 -_id');
+
+//     const allFriendIds = friendIds.map(friendship => friendship.userID1.equals(userId) ? friendship.userID2 : friendship.userID1);
+
+//     // Include the user's own ID
+//     allFriendIds.push(userId);
+
+//     // Find posts of friends and the user
+//     const posts = await Post.find({ userID: { $in: allFriendIds } }).sort({ postDate: -1 });
+
+//     // Populate the liked users for each post
+//     const postsWithLikes = await Promise.all(posts.map(async post => {
+//       const likedUsers = await Like.find({ postID: post._id }).populate('userID', 'username -_id');
+//       return { ...post._doc, likedUsers };
+//     }));
+
+//     res.json(postsWithLikes);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send('Internal Server Error');
+//   }
+// });
+
+
 
 module.exports = {
   userPost,

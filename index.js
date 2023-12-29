@@ -6,6 +6,7 @@ const cors = require("cors")
 const userRoutes = require("./routes/userRoutes")
 const postRoutes = require("./routes/postRoutes")
 const friendRequestRoute = require("./routes/friendRequestRoute")
+const likesRoute = require("./routes/likeRouter")
 
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 app.use("/api/user/", userRoutes)
 app.use("/api/post/", postRoutes)
 app.use("/api/friendRequest", friendRequestRoute)
+app.use('/api/likes', likesRoute)
 
 
 
