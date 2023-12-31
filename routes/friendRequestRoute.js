@@ -18,4 +18,3 @@ router.get("/", getAllFriendRequest);
 router.get("/findFriend", findFriend);
 
 module.exports = router;
-

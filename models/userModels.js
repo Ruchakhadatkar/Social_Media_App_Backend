@@ -34,6 +34,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  profilePicture: {
+    type: String,
+  },
 });
 
 //static signup mssg

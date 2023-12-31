@@ -1,6 +1,6 @@
 const Friends = require("../models/friendsModel");
 const Post = require("../models/postModel");
-const Likes = require("../models/likedModel")
+const Likes = require("../models/likedModel");
 
 const User = require("../models/userModels");
 
@@ -42,15 +42,21 @@ const getPost = async (req, res) => {
 
     // Find posts of friends and the user
     const posts = await Post.find({ userId: { $in: allFriendIds } })
-    .sort({
-      postDate: -1,
-    }).populate("userId", "name")
+      .sort({
+        postDate: -1,
+      })
+      .populate("userId", "name");
 
-     // Populate the liked users for each post
-     const postsWithLikes = await Promise.all(posts.map(async post => {
-      const likedUsers = await Likes.find({ postId: post._id }).populate('userId', 'name _id');
-      return { ...post._doc, likedUsers };
-    }));
+    // Populate the liked users for each post
+    const postsWithLikes = await Promise.all(
+      posts.map(async (post) => {
+        const likedUsers = await Likes.find({ postId: post._id }).populate(
+          "userId",
+          "name _id"
+        );
+        return { ...post._doc, likedUsers };
+      })
+    );
 
     res.json(postsWithLikes);
   } catch (error) {
@@ -58,7 +64,6 @@ const getPost = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 // app.get('/posts-with-likes/:userId', async (req, res) => {
 //   try {
@@ -90,8 +95,6 @@ const getPost = async (req, res) => {
 //     res.status(500).send('Internal Server Error');
 //   }
 // });
-
-
 
 module.exports = {
   userPost,

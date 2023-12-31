@@ -9,4 +9,3 @@ router.post("/", userPost);
 router.get("/", getPost);
 
 module.exports = router;
-
