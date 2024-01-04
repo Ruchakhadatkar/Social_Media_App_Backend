@@ -11,10 +11,10 @@ const {
 
 const router = express.Router();
 
-router.post("/", sendFriendRequest);
-router.put("/", acceptFriendRequest);
-router.delete("/:id", declineFriendRequest);
-router.get("/", getAllFriendRequest);
-router.get("/findFriend", findFriend);
+router.post("/", requireAuth, sendFriendRequest);
+router.put("/", requireAuth, acceptFriendRequest);
+router.delete("/:id", requireAuth, declineFriendRequest);
+router.get("/", requireAuth, getAllFriendRequest);
+router.get("/findFriend", requireAuth, findFriend);
 
 module.exports = router;

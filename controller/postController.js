@@ -22,7 +22,9 @@ const userPost = async (req, res) => {
 };
 
 const getPost = async (req, res) => {
-  const userId = req.query.id; // replace with the user's ID
+  const userId = req.query.id;
+  // replace with the user's ID
+  const { limit, skip } = req.query;
   try {
     const user = await User.findById(userId);
 
@@ -45,7 +47,7 @@ const getPost = async (req, res) => {
       .sort({
         postDate: -1,
       })
-      .populate("userId", "name");
+      .populate("userId", "name profilePicture");
 
     // Populate the liked users for each post
     const postsWithLikes = await Promise.all(
@@ -57,44 +59,13 @@ const getPost = async (req, res) => {
         return { ...post._doc, likedUsers };
       })
     );
-
-    res.json(postsWithLikes);
+    const newPostwithLikes = postsWithLikes.splice(skip, limit);
+    res.json(newPostwithLikes);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 };
-
-// app.get('/posts-with-likes/:userId', async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-
-//     // Get friends' IDs from the Friendship table
-//     const friendIds = await Friendship.find({
-//       $or: [{ userID1: userId }, { userID2: userId }],
-//       status: 'Accepted' // Assuming you have a 'status' field in Friendship to track the status
-//     }).select('userID1 userID2 -_id');
-
-//     const allFriendIds = friendIds.map(friendship => friendship.userID1.equals(userId) ? friendship.userID2 : friendship.userID1);
-
-//     // Include the user's own ID
-//     allFriendIds.push(userId);
-
-//     // Find posts of friends and the user
-//     const posts = await Post.find({ userID: { $in: allFriendIds } }).sort({ postDate: -1 });
-
-//     // Populate the liked users for each post
-//     const postsWithLikes = await Promise.all(posts.map(async post => {
-//       const likedUsers = await Like.find({ postID: post._id }).populate('userID', 'username -_id');
-//       return { ...post._doc, likedUsers };
-//     }));
-
-//     res.json(postsWithLikes);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
 
 module.exports = {
   userPost,

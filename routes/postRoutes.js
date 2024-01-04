@@ -4,8 +4,8 @@ const { userPost, getPost } = require("../controller/postController");
 const { route } = require("./friendRequestRoute");
 const router = express.Router();
 
-router.post("/", userPost);
+router.post("/",requireAuth, userPost);
 
-router.get("/", getPost);
+router.get("/",requireAuth, getPost);
 
 module.exports = router;

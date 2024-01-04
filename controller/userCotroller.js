@@ -17,7 +17,13 @@ const loginUser = async (req, res) => {
     //create Token
     const token = createToken(user._id);
 
-    res.status(200).json({ email, token, id: user._id });
+    res.status(200).json({
+      email,
+      token,
+      id: user._id,
+      name: user.name,
+      profilePicture: user.profilePicture,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -42,17 +48,25 @@ const signupUser = async (req, res) => {
     //create Token
     const token = createToken(user._id);
 
-    res.status(200).json({ email, token, id: user._id });
+    res.status(200).json({
+      email,
+      token,
+      id: user._id,
+      name,
+      profilePicture: user.profilePicture,
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
 
 const getUserInfo = async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
   try {
     // Get user's basic information
-    const user = await User.findById(id).select("name email contact dateofBirth city _id");
+    const user = await User.findById(id).select(
+      "name email contact dateofBirth city _id profilePicture"
+    );
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -65,9 +79,7 @@ const getUserInfo = async (req, res) => {
     }).select("userId1 userId2 -_id");
 
     const allFriendIds = friendIds.map((friendship) =>
-      friendship.userId1.equals(id)
-        ? friendship.userId2
-        : friendship.userId1
+      friendship.userId1.equals(id) ? friendship.userId2 : friendship.userId1
     );
 
     // Include the user's own ID
@@ -75,7 +87,7 @@ const getUserInfo = async (req, res) => {
 
     // Get user's friends
     const friends = await User.find({ _id: { $in: allFriendIds } }).select(
-      "name email -_id"
+      "name email profilePicture -_id"
     );
 
     // Get user's posts
@@ -103,61 +115,15 @@ const getUserInfo = async (req, res) => {
   }
 };
 
-const updateUseInfo= async(req,res)=>{
-  const {id}= req.params
-  const {profilePicture}= req.body
+const updateUseInfo = async (req, res) => {
+  const { id } = req.params;
+  const { profilePicture } = req.body;
   try {
-    const data = await User.findByIdAndUpdate(id, {profilePicture})
-    res.json(data)
+    const data = await User.findByIdAndUpdate(id, { profilePicture });
+    res.json(data);
   } catch (error) {
     console.error(error);
   }
-
-}
+};
 
 module.exports = { signupUser, loginUser, getUserInfo, updateUseInfo };
-
-// app.get('/user-profile/:userId', async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-
-//     // Get user's basic information
-//     const user = await User.findById(userId).select('username email -_id');
-
-//     if (!user) {
-//       return res.status(404).json({ message: 'User not found' });
-//     }
-
-//     // Get friends' IDs from the Friendship table
-//     const friendIds = await Friendship.find({
-//       $or: [{ userID1: userId }, { userID2: userId }],
-//       status: 'Accepted'
-//     }).select('userID1 userID2 -_id');
-
-//     const allFriendIds = friendIds.map(friendship => friendship.userID1.equals(userId) ? friendship.userID2 : friendship.userID1);
-
-//     // Include the user's own ID
-//     allFriendIds.push(userId);
-
-//     // Get user's friends
-//     const friends = await User.find({ _id: { $in: allFriendIds } }).select('username email -_id');
-
-//     // Get user's posts
-//     const posts = await Post.find({ userID: userId }).sort({ postDate: -1 });
-
-//     // Populate the liked users for each post
-//     const postsWithLikes = await Promise.all(posts.map(async post => {
-//       const likedUsers = await Like.find({ postID: post._id }).populate('userID', 'username -_id');
-//       return { ...post._doc, likedUsers };
-//     }));
-
-//     res.json({
-//       user,
-//       friends,
-//       posts: postsWithLikes,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send('Internal Server Error');
-//   }
-// });
