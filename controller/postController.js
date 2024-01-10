@@ -24,7 +24,6 @@ const userPost = async (req, res) => {
 const getPost = async (req, res) => {
   const userId = req.query.id;
   // replace with the user's ID
-  const { limit, skip } = req.query;
   try {
     const user = await User.findById(userId);
 
@@ -59,8 +58,7 @@ const getPost = async (req, res) => {
         return { ...post._doc, likedUsers };
       })
     );
-    const newPostwithLikes = postsWithLikes.splice(skip, limit);
-    res.json(newPostwithLikes);
+    res.json(postsWithLikes)
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

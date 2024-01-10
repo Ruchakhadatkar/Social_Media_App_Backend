@@ -22,7 +22,6 @@ const sendFriendRequest = async (req, res) => {
 
 const acceptFriendRequest = async (req, res) => {
   const { reqId, status } = req.body;
-
   try {
     const data = await Request.findByIdAndUpdate(reqId, { status });
     if (data) {
@@ -107,7 +106,7 @@ const findFriend = async (req, res) => {
     const potentialFriends = await User.find({
       _id: { $nin: excludedFriendIds },
       name: { $regex: searchQuery, $options: "i" },
-    }).select("name email _id");
+    }).select("name email _id profilePicture");
 
     res.json({ data: potentialFriends, success: true });
   } catch (error) {
